@@ -1,74 +1,116 @@
-# Intel 8080 CPU Emulator & Assembler - Version 2.1.0
+# Intel 8080 CPU Emulator + Coprocesador FPU Conceptual - Version 3.0
 
-Bienvenidos al emulador y ensamblador de la arquitectura Intel 8080. Este proyecto ha sido construido desde cero utilizando tecnología 100% web pura (HTML5, CSS3 y Vanilla JavaScript) sin frameworks ni dependencias de ningún tipo, garantizando una carga instantánea y la máxima compatibilidad educativa.
+Fork académico del proyecto original **Intel 8080 CPU Emulator & Assembler**, ampliado con la integración conceptual de un coprocesador de punto flotante.
 
----
+## Objetivo de la ampliación
 
-## 🌟 ¿Por qué nació este proyecto? (Historia y Propósito)
+El Intel 8080 trabaja principalmente con aritmética entera de 8 y 16 bits y no posee una unidad de punto flotante integrada. Esta versión agrega una **FPU conceptual externa** para representar de forma didáctica cómo una CPU puede delegar operaciones matemáticas de punto flotante a un coprocesador especializado.
 
-En la enseñanza de la informática y la ingeniería de sistemas, existe una brecha pedagógica crítica al transicionar de lenguajes de alto nivel (como Python, Java o JavaScript) al entendimiento del hardware real. Los simuladores tradicionales de bajo nivel suelen ser difíciles de instalar, tienen interfaces obsoletas o carecen de feedback visual inmediato.
+> La FPU implementada no pretende afirmar que el Intel 8080 original incluía una FPU. Se presenta como una ampliación conceptual para fines educativos.
 
-**Este simulador nació con el propósito de resolver este problema.** Su objetivo es democratizar la enseñanza de la arquitectura de computadoras proporcionando un entorno gráfico intuitivo, interactivo y moderno. Permite a los estudiantes "ver dentro" de una unidad central de procesamiento (CPU): observar cómo cambian los registros paso a paso, cómo fluyen los datos en la memoria RAM y cómo se comportan las banderas de estado (*flags*) en respuesta a operaciones aritméticas elementales.
+## Arquitectura conceptual
 
----
+```text
+┌──────────────────┐       BUS DE DATOS / CONTROL       ┌──────────────────┐
+│    Intel 8080    │  ───────────────────────────────▶  │ FPU conceptual   │
+│ Control / enteros│  ◀───────────────────────────────  │ Float32 IEEE 754 │
+└──────────────────┘                                    └──────────────────┘
+```
 
-## 🛠️ ¿Para qué sirve?
+La CPU mantiene el control general del sistema y el coprocesador se utiliza para cálculos que requieren representación de punto flotante.
 
-*   **Enseñanza Didáctica y Práctica:** Ideal para profesores y estudiantes de ciencias de la computación que desean experimentar la programación en lenguaje ensamblador sin la fricción de instalar herramientas en sistemas operativos locales.
-*   **Visualización de Flujo de Datos:** El panel interactivo permite observar las dinámicas de:
-    *   Los registros de propósito general y específicos.
-    *   Las operaciones de pila (*Stack*) con seguimiento visual directo de la dirección apuntada por `SP`.
-    *   La memoria RAM desglosada en un mapa bidimensional interactivo con localización instantánea.
-*   **Depuración Paso a Paso (*Debugging*):** Permite ejecutar programas instrucción por instrucción, deteniendo y analizando el procesador para encontrar errores de lógica con facilidad.
+## Funcionalidades originales conservadas
 
----
+- Emulador Intel 8080.
+- Ensamblador integrado.
+- Registros A, B, C, D, E, H y L.
+- PC y SP.
+- Banderas S, Z, AC, P y CY.
+- Visualización de memoria.
+- Visualización de pila.
+- Ejecución completa, paso a paso y reinicio.
 
-## 🚀 Novedades de la Versión 2.1.0
+## Funcionalidades FPU agregadas
 
-Esta versión representa un gran salto adelante en la calidad del entorno de desarrollo web:
-- **Visualizador de Pila (*Stack View*):** Un componente visual que muestra los valores de 16 bits y bytes individuales que se encuentran en las posiciones de memoria alrededor de la dirección del puntero de pila (`SP`).
-- **Banderas Explicadas (*Tooltips*):** Al colocar el puntero del ratón sobre cualquiera de las banderas de estado (`S`, `Z`, `AC`, `P`, `CY`), se muestra un tooltip detallado en español explicando su lógica.
-- **Botón Clear Code:** Permite vaciar el editor del ensamblador y sus salidas con un solo clic.
-- **Reset Profundo:** Al reiniciar el CPU, se limpia la memoria por completo (rellenando con ceros), se resetean todos los registros, banderas y el visor de memoria se restablece a la dirección inicial `0000`.
+- Cuatro registros conceptuales de 32 bits: `F0`, `F1`, `F2` y `F3`.
+- Operaciones Float32:
+  - Suma.
+  - Resta.
+  - Multiplicación.
+  - División.
+  - Raíz cuadrada.
+- Conversión automática a precisión simple mediante `Float32Array`.
+- Representación IEEE 754:
+  - Bit de signo.
+  - Exponente de 8 bits.
+  - Mantisa de 23 bits.
+  - Valor hexadecimal de 32 bits.
+- Historial de las últimas operaciones.
+- Gráfica dinámica de resultados con Canvas HTML5.
+- Diagrama visual de comunicación CPU ⇄ FPU.
+- Demostración rápida incluida: `12.75 × 3.5 = 44.625`.
 
----
+## Registros de la FPU
 
-## 📦 Características Principales
+| Registro | Uso conceptual |
+|---|---|
+| F0 | Operando A |
+| F1 | Operando B |
+| F2 | Resultado |
+| F3 | Contador de operaciones |
 
-*   **Núcleo de CPU Intel 8080 Completo:**
-    *   Emulación fiel del juego de instrucciones.
-    *   Gestión precisa de banderas (Sign, Zero, Auxiliary Carry, Parity, Carry).
-    *   Soporte completo de la instrucción decimal `DAA`.
-*   **Ensamblador Integrado:**
-    *   Soporta mnemónicos estándar, etiquetas (labels) y comentarios.
-    *   Directivas especiales como `ORG` (Origin) y `DB` (Define Byte).
-    *   Soporta alias de registros dobles (`BC`, `DE`, `HL`).
-*   **Cuadro de Mando Visual (Dashboard):**
-    *   Registros en tiempo real.
-    *   Estado del CPU (Ejecutando, En pausa, Halted).
-*   **Mapa de Memoria Dinámico:**
-    *   Visor de memoria con búsqueda hexadecimal y marcado de color para la posición actual del Program Counter (`PC`).
+## Ejemplo de demostración
 
----
+1. Abrir el sitio.
+2. Ir al panel **Coprocesador de Punto Flotante (FPU)**.
+3. Presionar **Demo 12.75 × 3.5**.
+4. El sistema envía conceptualmente los operandos desde la CPU hacia la FPU.
+5. La FPU calcula el resultado.
+6. Se muestra `44.625` en F2.
+7. Se muestra la representación Float32 IEEE 754.
+8. La operación se agrega al historial y a la gráfica.
 
-## 💻 Guía de Inicio Rápido
+También es posible ingresar valores manuales y seleccionar cualquiera de las operaciones disponibles.
 
-Para utilizar el emulador de forma local en tu máquina o para desarrollo:
+## Ejecución local
 
-1. **Clonar o descargar** este repositorio.
-2. Servir el proyecto localmente mediante cualquier servidor web estático. Por ejemplo, si tienes Python instalado, ejecuta en la terminal de la raíz:
-   ```bash
-   python3 -m http.server 8000
-   ```
-3. Abre tu navegador e ingresa a `http://localhost:8000`.
-4. ¡Comienza a escribir código ensamblador, presiona **Assemble & Load**, y ejecuta tu programa con **Run** o **Step**!
+No requiere frameworks ni dependencias.
 
----
+Con Python:
 
-## 📝 Documentación Recomendada
+```bash
+python -m http.server 8000
+```
 
-*   **`INSTRUCTIONS.md`:** Nuestro libro didáctico interactivo diseñado específicamente para que los estudiantes de alto nivel aprendan el funcionamiento práctico del ensamblador paso a paso, con guías estructuradas de aritmética, ciclos, condicionales y la pila.
+Luego abrir:
 
----
-**Versión del Proyecto:** 2.1.0
-**Licencia:** MIT
+```text
+http://localhost:8000
+```
+
+También puede abrirse directamente `index.html` en un navegador moderno.
+
+## Archivos principales
+
+- `index.html`: interfaz del emulador y de la FPU.
+- `styles.css`: diseño responsive.
+- `cpu.js`: núcleo del Intel 8080.
+- `assembler.js`: ensamblador.
+- `main.js`: interfaz del CPU.
+- `fpu.js`: coprocesador de punto flotante conceptual, IEEE 754, historial y gráfica.
+
+## Entregable académico
+
+El proyecto demuestra visualmente:
+
+1. Funcionamiento del emulador Intel 8080.
+2. Separación conceptual entre CPU y coprocesador.
+3. Delegación de cálculos de punto flotante.
+4. Registros propios de la FPU.
+5. Operaciones Float32.
+6. Representación IEEE 754.
+7. Gráfica e historial de resultados.
+
+**Fork:** Wcolindresc/8080  
+**Versión académica:** 3.0 FPU  
+**Tecnologías:** HTML5, CSS3 y Vanilla JavaScript.
