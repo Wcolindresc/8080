@@ -1,32 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intel 8080 Emulator & Assembler</title>
+    <title>Intel 8080 + Coprocesador FPU</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <div class="header-container">
-            <h1>Intel 8080 Emulator & Assembler</h1>
-            <span class="version-badge">Version 2.1</span>
+            <div>
+                <h1>Intel 8080 Emulator & Assembler</h1>
+                <p class="header-subtitle">Integración conceptual de coprocesador de punto flotante</p>
+            </div>
+            <span class="version-badge">Version 3.0 FPU</span>
         </div>
     </header>
 
     <main>
         <section id="editor-section">
-            <h2>Assembler</h2>
-            <textarea id="code-editor" spellcheck="false" placeholder="Write your 8080 assembly here...
-Example:
+            <h2>Ensamblador Intel 8080</h2>
+            <textarea id="code-editor" spellcheck="false" placeholder="Escriba código ensamblador 8080...
+Ejemplo:
 MVI A, 5
 MVI B, 10
 ADD B
 STA 2000H
 HLT"></textarea>
             <div class="controls">
-                <button id="btn-assemble">Assemble & Load</button>
-                <button id="btn-clear-code" class="btn-clear">Clear Code</button>
+                <button id="btn-assemble">Ensamblar y cargar</button>
+                <button id="btn-clear-code" class="btn-clear">Limpiar código</button>
             </div>
             <div id="assembler-output"></div>
         </section>
@@ -34,16 +37,16 @@ HLT"></textarea>
         <section id="emulator-section">
             <h2>CPU Dashboard</h2>
             <div class="controls">
-                <button id="btn-run">Run</button>
-                <button id="btn-stop">Stop</button>
-                <button id="btn-step">Step</button>
-                <button id="btn-reset">Reset</button>
+                <button id="btn-run">Ejecutar</button>
+                <button id="btn-stop">Detener</button>
+                <button id="btn-step">Paso</button>
+                <button id="btn-reset">Reiniciar CPU</button>
                 <span id="status-badge">Idle</span>
             </div>
 
             <div class="cpu-grid">
                 <div class="card registers">
-                    <h3>Registers</h3>
+                    <h3>Registros</h3>
                     <div class="reg-row">
                         <div class="reg-box"><span>A</span><div id="reg-a">00</div></div>
                         <div class="reg-box"><span>Flags</span><div id="reg-f">02</div></div>
@@ -68,36 +71,142 @@ HLT"></textarea>
 
                 <div class="dashboard-right">
                     <div class="card flags">
-                        <h3>Flags</h3>
+                        <h3>Banderas</h3>
                         <div class="flags-row">
-                            <div class="flag-box" title="Sign Flag (Signo): Se activa (1) si el bit más significativo (bit 7) del resultado es 1, indicando un número negativo."><span>S</span><div id="flag-s">0</div></div>
-                            <div class="flag-box" title="Zero Flag (Cero): Se activa (1) si el resultado de la última operación fue exactamente cero."><span>Z</span><div id="flag-z">0</div></div>
-                            <div class="flag-box" title="Auxiliary Carry Flag (Acarreo Auxiliar): Se activa (1) si hay un acarreo del bit 3 al bit 4 en una suma, o si no hay préstamo en una resta. Es utilizado por DAA."><span>AC</span><div id="flag-ac">0</div></div>
-                            <div class="flag-box" title="Parity Flag (Paridad): Se activa (1) si el resultado tiene un número par de bits en 1."><span>P</span><div id="flag-p">0</div></div>
-                            <div class="flag-box" title="Carry Flag (Acarreo): Se activa (1) si la última operación generó un acarreo (en suma) o un préstamo (en resta) fuera del bit más significativo."><span>CY</span><div id="flag-cy">0</div></div>
+                            <div class="flag-box" title="Sign Flag"><span>S</span><div id="flag-s">0</div></div>
+                            <div class="flag-box" title="Zero Flag"><span>Z</span><div id="flag-z">0</div></div>
+                            <div class="flag-box" title="Auxiliary Carry"><span>AC</span><div id="flag-ac">0</div></div>
+                            <div class="flag-box" title="Parity Flag"><span>P</span><div id="flag-p">0</div></div>
+                            <div class="flag-box" title="Carry Flag"><span>CY</span><div id="flag-cy">0</div></div>
                         </div>
                     </div>
 
                     <div class="card stack">
-                        <h3>Stack View (around SP)</h3>
+                        <h3>Pila (Stack)</h3>
                         <div id="stack-table"></div>
                     </div>
                 </div>
 
                 <div class="card memory">
-                    <h3>Memory View</h3>
+                    <h3>Memoria</h3>
                     <div class="mem-controls">
                         <input type="text" id="mem-start-addr" value="0000" size="4">
-                        <button id="btn-mem-go">Go</button>
+                        <button id="btn-mem-go">Ir</button>
                     </div>
                     <div id="memory-table"></div>
                 </div>
             </div>
+
+            <div class="fpu-divider">
+                <span>INTEGRACIÓN CON COPROCESADOR</span>
+            </div>
+
+            <section id="fpu-section" class="fpu-panel">
+                <div class="fpu-title-row">
+                    <div>
+                        <h2>Coprocesador de Punto Flotante (FPU)</h2>
+                        <p>Extensión conceptual del Intel 8080 para operaciones Float32 / IEEE 754.</p>
+                    </div>
+                    <span class="fpu-status-badge">Estado: <strong id="fpu-status">READY</strong></span>
+                </div>
+
+                <div class="architecture-flow">
+                    <div class="architecture-node cpu-node">
+                        <strong>Intel 8080</strong>
+                        <span>Control y enteros</span>
+                    </div>
+                    <div class="bus-node">
+                        <span>BUS DE DATOS / CONTROL</span>
+                        <strong>CPU ⇄ FPU</strong>
+                    </div>
+                    <div class="architecture-node fpu-node">
+                        <strong>FPU conceptual</strong>
+                        <span>Operaciones Float32</span>
+                    </div>
+                </div>
+
+                <div class="fpu-grid">
+                    <div class="card fpu-controls-card">
+                        <h3>Unidad de operación</h3>
+                        <label for="fpu-a">Operando A</label>
+                        <input type="number" id="fpu-a" step="any" value="12.75">
+
+                        <label for="fpu-b">Operando B</label>
+                        <input type="number" id="fpu-b" step="any" value="3.5">
+
+                        <label for="fpu-operation">Operación</label>
+                        <select id="fpu-operation">
+                            <option value="add">Suma (+)</option>
+                            <option value="sub">Resta (−)</option>
+                            <option value="mul" selected>Multiplicación (×)</option>
+                            <option value="div">División (÷)</option>
+                            <option value="sqrt">Raíz cuadrada (√A)</option>
+                        </select>
+
+                        <div class="controls fpu-buttons">
+                            <button id="btn-fpu-execute">Ejecutar en FPU</button>
+                            <button id="btn-fpu-demo" class="btn-demo">Demo 12.75 × 3.5</button>
+                            <button id="btn-fpu-reset" class="btn-clear">Reiniciar FPU</button>
+                        </div>
+                        <div id="fpu-message" class="fpu-message">FPU lista para recibir una operación.</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Registros FPU</h3>
+                        <div class="fpu-registers">
+                            <div class="fpu-reg"><span>F0 · Operando A</span><strong id="fpu-f0">0</strong></div>
+                            <div class="fpu-reg"><span>F1 · Operando B</span><strong id="fpu-f1">0</strong></div>
+                            <div class="fpu-reg"><span>F2 · Resultado</span><strong id="fpu-f2">0</strong></div>
+                            <div class="fpu-reg"><span>F3 · Contador</span><strong id="fpu-f3">0</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="card fpu-result-card">
+                        <h3>Resultado y representación IEEE 754</h3>
+                        <div class="result-value" id="fpu-result">0</div>
+                        <div class="hex-value">Float32 Hex: <strong id="fpu-hex">0x00000000</strong></div>
+                        <div class="ieee-grid">
+                            <div><span>Signo</span><strong id="ieee-sign">0</strong></div>
+                            <div><span>Exponente (8 bits)</span><strong id="ieee-exp">00000000</strong></div>
+                            <div><span>Mantisa (23 bits)</span><strong id="ieee-mantissa">00000000000000000000000</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="card chart-card">
+                        <h3>Gráfica de resultados</h3>
+                        <canvas id="fpu-chart" aria-label="Gráfica de resultados de la FPU"></canvas>
+                    </div>
+
+                    <div class="card history-card">
+                        <h3>Historial de operaciones</h3>
+                        <div class="table-wrapper">
+                            <table class="fpu-history">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Operación</th>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Resultado</th>
+                                        <th>IEEE 754 Hex</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fpu-history-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-note">
+                    <strong>Nota conceptual:</strong> el Intel 8080 original no incorporaba una FPU nativa. Este módulo simula una arquitectura educativa en la que la CPU delega operaciones de punto flotante a un coprocesador externo por medio de un bus de datos y control.
+                </div>
+            </section>
         </section>
     </main>
 
     <script src="cpu.js"></script>
     <script src="assembler.js"></script>
     <script src="main.js"></script>
+    <script src="fpu.js"></script>
 </body>
 </html>
