@@ -59,36 +59,6 @@ La CPU mantiene el control general del sistema y el coprocesador se utiliza para
 | F2 | Resultado |
 | F3 | Contador de operaciones |
 
-## Ejemplo de demostración
-
-1. Abrir el sitio.
-2. Ir al panel **Coprocesador de Punto Flotante (FPU)**.
-3. Presionar **Demo 12.75 × 3.5**.
-4. El sistema envía conceptualmente los operandos desde la CPU hacia la FPU.
-5. La FPU calcula el resultado.
-6. Se muestra `44.625` en F2.
-7. Se muestra la representación Float32 IEEE 754.
-8. La operación se agrega al historial y a la gráfica.
-
-También es posible ingresar valores manuales y seleccionar cualquiera de las operaciones disponibles.
-
-## Ejecución local
-
-No requiere frameworks ni dependencias.
-
-Con Python:
-
-```bash
-python -m http.server 8000
-```
-
-Luego abrir:
-
-```text
-http://localhost:8000
-```
-
-También puede abrirse directamente `index.html` en un navegador moderno.
 
 ## Archivos principales
 
@@ -113,4 +83,4 @@ El proyecto demuestra visualmente:
 
 **Fork:** Wcolindresc/8080  
 **Versión académica:** 3.0 FPU  
-**Tecnologías:** HTML5, CSS3 y Vanilla JavaScript.
+**Tecnologías:** HTML5, CSS3 y JavaScript.
